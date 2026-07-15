@@ -10,6 +10,6 @@ Required network access:
 Environment variable:
 OTLP_ENDPOINT=http://3.70.114.43:4317
 
-The Kubernetes Service configuration may need to be adapted
+The Kubernetes Service configuration needs to be adapted
 to the networking and external exposure configuration of the
 target cluster.
