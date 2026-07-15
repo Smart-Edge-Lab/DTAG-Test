@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-latency-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-latency-server
+  template:
+    metadata:
+      labels:
+        app: network-latency-server
+    spec:
+      containers:
+        - name: network-latency-server
+          image: akcun002/network-latency-server:latest
+          ports:
+            - name: tcp-5014
+              containerPort: 5014
+              protocol: TCP
+            - name: udp-5014
+              containerPort: 5014
+              protocol: UDP
+          env:
+            - name: OTLP_ENDPOINT
+              value: "http://3.70.114.43:4317"
