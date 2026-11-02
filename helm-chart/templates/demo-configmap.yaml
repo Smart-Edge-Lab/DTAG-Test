@@ -1,0 +1,59 @@
+{{- if .Values.demo.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "network-latency-server.fullname" . }}-demo-html
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "network-latency-server.labels" . | nindent 4 }}
+data:
+  index.html: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="refresh" content="{{ .Values.demo.refreshSeconds }}">
+      <title>{{ .Values.demo.title | html }}</title>
+      <style>
+        body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#f4f4f6; color:#222; }
+        header { background: {{ .Values.demo.accentColor | html }}; color:#fff; padding:28px 40px; }
+        header h1 { margin:0; font-size:32px; }
+        header p { margin:6px 0 0; opacity:.9; }
+        main { max-width:900px; margin:32px auto; padding:0 24px; }
+        .message { background:#fff; border-left:10px solid {{ .Values.demo.accentColor | html }}; padding:28px 32px; font-size:40px; font-weight:bold; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+        .label { font-size:13px; text-transform:uppercase; letter-spacing:1px; color:#777; margin-bottom:8px; font-weight:normal; }
+        table { width:100%; border-collapse:collapse; margin-top:28px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+        td { padding:14px 20px; border-bottom:1px solid #eee; font-size:18px; }
+        td:first-child { color:#777; width:40%; }
+        td:last-child { font-weight:bold; font-family: Consolas, monospace; }
+        footer { margin:28px 0; color:#777; font-size:14px; }
+      </style>
+    </head>
+    <body>
+      <header>
+        <h1>{{ .Values.demo.title | html }}</h1>
+        <p>Cluster: {{ .Values.demo.clusterName | html }}</p>
+      </header>
+      <main>
+        <div class="message">
+          <div class="label">Message from values.yaml</div>
+          {{ .Values.demo.message | html }}
+        </div>
+        <table>
+          <tr><td>Cluster</td><td>{{ .Values.demo.clusterName | html }}</td></tr>
+          <tr><td>Accent colour</td><td>{{ .Values.demo.accentColor | html }}</td></tr>
+          <tr><td>App replicas</td><td>{{ .Values.replicaCount }}</td></tr>
+          <tr><td>Chart build (version+git commit)</td><td>{{ .Chart.Version | html }}</td></tr>
+          <tr><td>Helm release revision</td><td>{{ .Release.Revision }}</td></tr>
+          {{- range .Values.env }}
+          {{- if eq .name "TEST_VALUE" }}
+          <tr><td>TEST_VALUE</td><td>{{ .value | html }}</td></tr>
+          {{- end }}
+          {{- end }}
+        </table>
+        <footer>Deployed by FluxCD from Git. This page refreshes every {{ .Values.demo.refreshSeconds }} seconds.</footer>
+      </main>
+    </body>
+    </html>
+{{- end }}

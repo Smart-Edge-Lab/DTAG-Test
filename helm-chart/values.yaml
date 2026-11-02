@@ -1,0 +1,93 @@
+# Default values for network-latency-server.
+
+nameOverride: ""
+fullnameOverride: "network-latency-server"
+
+namespace: westcluster
+
+replicaCount: 1
+
+image:
+  repository: docker.io/akcun002/network-latency-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Application ports (used for container, service and networkpolicy)
+ports:
+  - name: tcp-5014
+    port: 5014
+    targetPort: 5014
+    protocol: TCP
+  - name: udp-5014
+    port: 5014
+    targetPort: 5014
+    protocol: UDP
+
+env:
+  - name: OTLP_ENDPOINT
+    value: "http://3.70.114.43:4317"
+  - name: TEST_VALUE
+    value: "Test"
+
+service:
+  type: LoadBalancer
+  ipFamilyPolicy: PreferDualStack
+  externalTrafficPolicy: Local
+  sessionAffinity: None
+  annotations:
+    metallb.io/address-pool: p-ipmb-public
+    metallb.io/loadBalancerIPs: "37.51.192.45,2a01:598:7e0:be4::1"
+
+networkPolicy:
+  enabled: true
+  name: westcluster-allow-all
+  # Set to [] to allow all pods (matches podSelector: {} from source manifest)
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: ::/0
+      ports:
+        - port: 5014
+          protocol: TCP
+        - port: 5014
+          protocol: UDP
+    - {}
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: ::/0
+
+# ---------------------------------------------------------------------------
+# Demo web page: shows values from this file so a GitOps change is visible.
+# Edit a value (e.g. demo.message), commit to main, watch the page update.
+# NOTE: do not put ${...} in these texts (Flux variable substitution).
+# ---------------------------------------------------------------------------
+demo:
+  enabled: true
+  clusterName: "unknown"
+  title: "GitOps with FluxCD"
+  message: "Hello from Git"
+  accentColor: "#e20074"
+  refreshSeconds: 10
+  image:
+    repository: docker.io/nginxinc/nginx-unprivileged
+    tag: "1.27-alpine"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: LoadBalancer
+    port: 80
+    externalTrafficPolicy: Cluster
+    ipFamilyPolicy: SingleStack
+    annotations:
+      metallb.io/address-pool: p-ipmb-public
+      # Optional fixed IP (otherwise MetalLB picks a free one from the pool):
+      # metallb.io/loadBalancerIPs: "x.x.x.x"

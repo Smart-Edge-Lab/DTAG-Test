@@ -1,0 +1,24 @@
+{{- if .Values.demo.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "network-latency-server.fullname" . }}-demo
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "network-latency-server.labels" . | nindent 4 }}
+  {{- if .Values.demo.service.annotations }}
+  annotations:
+    {{- toYaml .Values.demo.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.demo.service.type }}
+  ipFamilyPolicy: {{ .Values.demo.service.ipFamilyPolicy }}
+  externalTrafficPolicy: {{ .Values.demo.service.externalTrafficPolicy }}
+  ports:
+    - name: http
+      port: {{ .Values.demo.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: {{ include "network-latency-server.fullname" . }}-demo
+{{- end }}
