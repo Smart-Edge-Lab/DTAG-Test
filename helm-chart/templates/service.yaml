@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "network-latency-server.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "network-latency-server.labels" . | nindent 4 }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  sessionAffinity: {{ .Values.service.sessionAffinity }}
+  ports:
+    {{- range .Values.ports }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: {{ .protocol }}
+    {{- end }}
+  selector:
+    app: {{ include "network-latency-server.fullname" . }}

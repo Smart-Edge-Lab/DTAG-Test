@@ -1,0 +1,8 @@
+network-latency-server has been deployed to namespace: {{ .Values.namespace }}
+
+Check status with:
+  kubectl get pods,svc,networkpolicy -n {{ .Values.namespace }} -l app={{ include "network-latency-server.fullname" . }}
+
+The LoadBalancer service will be assigned an IP from the "p-ipmb-public" MetalLB pool.
+Get the external IP with:
+  kubectl get svc {{ include "network-latency-server.fullname" . }} -n {{ .Values.namespace }}
